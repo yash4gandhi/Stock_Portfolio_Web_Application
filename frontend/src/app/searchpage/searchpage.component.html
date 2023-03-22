@@ -1,0 +1,366 @@
+
+<app-search-form></app-search-form>
+<mat-spinner
+  *ngIf="
+    (!metadata )
+       &&
+    tickerExist
+  "
+  class="mt-4 mx-auto"
+></mat-spinner>
+
+<div
+  *ngIf="
+    metadata 
+  "
+  class="container mt-5"
+>
+  <!-- buy success alert -->
+  <ngb-alert
+    *ngIf="buysuc"
+    type="success"
+    class="text-center"
+    (close)="buysuc = ''"
+    >{{ ticker | uppercase }} bought successfully!</ngb-alert
+  >
+  <!-- watchlist alert -->
+  <ngb-alert
+    *ngIf="starsuc && inWatchlist"
+    type="success"
+    class="text-center"
+    (close)="starsuc = ''"
+    >{{ ticker | uppercase }} added to Watchlist.</ngb-alert
+  >
+  <ngb-alert
+    *ngIf="starsuc && !inWatchlist"
+    type="danger"
+    class="text-center"
+    (close)="starsuc = ''"
+    >{{ ticker | uppercase }} removed from Watchlist.</ngb-alert
+  >
+
+  <!-- details header area -->
+  <div class="detail-header" *ngIf=" tickerExist">
+    <div class="row" >
+      <div class="col">
+        <h1 class="m-0 p-0 d-flex flex-row" id="meta-ticker">
+          {{ metadata.ticker }}
+          <div class="m-0 p-0 d-inline-flex" (click)="onClickStar()">
+            <svg
+              *ngIf="inWatchlist"
+              width="0.5em"
+              height="0.5em"
+              viewBox="0 0 16 16"
+              class="bi bi-star-fill mx-1 my-0"
+              fill="#FFC300"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                class="star-fill-icon"
+                d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.283.95l-3.523 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"
+              />
+            </svg>
+            <svg
+              *ngIf="!inWatchlist"
+              width="0.5em"
+              height="0.5em"
+              viewBox="0 0 16 16"
+              class="bi bi-star mx-1 my-0"
+              fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                class="star-icon"
+                fill-rule="evenodd"
+                d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.523-3.356c.329-.314.158-.888-.283-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767l-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288l1.847-3.658 1.846 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.564.564 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"
+              />
+            </svg>
+          </div>
+        </h1>
+        <h3 class="m-0 p-0 text-black-50 d-flex flex-row" id="meta-name">
+          {{ metadata.name }}
+        </h3>
+        <h4 class="m-0 p-0 font-weight-light d-flex flex-row">
+          {{ metadata.exchange }}
+        </h4>
+        <button
+          class="btn btn-primary m-0 p-1 px-2 bg-success border-0"
+          id="buy-button"
+          (click)="
+            openTransectionButton(
+              metadata.ticker,
+              metadata.name,
+              latestprice.c,
+              'Buy'
+            )
+          "
+        >
+          Buy
+        </button>
+        &nbsp;&nbsp;
+        <button
+          *ngIf="isWalletBalance"
+          class="btn btn-danger m-0 p-1 px-2 bg-danger border-0"
+          id="buy-button"
+          (click)="
+            openTransectionButton(
+              metadata.ticker,
+              metadata.name,
+              latestprice.c,
+              'Sell'
+            )
+          "
+        >
+          Sell
+        </button>
+      </div>
+      <div class="col" style="display: flex; justify-content: center;"> 
+        <div class="row">
+          <img style="height: 75px;" [src]="metadata.logo" alt="">
+        </div>
+      </div>
+      <div class="col">
+        <h1
+          class="m-0 p-0 d-flex flex-row-reverse latest-last"
+          [class.text-success]="change > 0"
+          [class.text-danger]="change < 0"
+        >
+          {{ latestprice.c }}
+        </h1>
+        <!-- if change positive, green price; if negative red; if 0, black -->
+        <div class="row mr-1 flex-row justify-content-end">
+          <div class="row m-0 p-0">
+            <!-- green arrow up if positive change -->
+            <svg
+              *ngIf="change > 0"
+              width="2em"
+              height="2em"
+              viewBox="0 0 16 16"
+              class="bi bi-caret-up-fill"
+              fill="green"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                class="pos"
+                d="M7.247 4.86l-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"
+              />
+            </svg>
+            <!-- red arrow down if negative change -->
+            <svg
+              *ngIf="change < 0"
+              width="2em"
+              height="2em"
+              viewBox="0 0 16 16"
+              class="bi bi-caret-down-fill"
+              fill="red"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                class="neg"
+                d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"
+              />
+            </svg>
+            <h2
+              class="m-0 p-0 d-flex flex-row-reverse change-latest"
+              [class.text-success]="change > 0"
+              [class.text-danger]="change < 0"
+            >
+              {{ change | number: "1.2-2" }}
+            </h2>
+          </div>
+          <div class="col-sm m-0 p-0 col-md-auto">
+            <h2
+              class="m-0 p-0 d-flex flex-row-reverse change-latest"
+              [class.text-success]="change > 0"
+              [class.text-danger]="change < 0"
+            >
+              ({{ changePercent | number: "1.2-2" }}%)
+            </h2>
+          </div>
+        </div>
+
+        <h4 class="m-0 p-0 font-weight-light d-flex flex-row-reverse">
+          {{ localCurrentTime | date: "yyyy-MM-dd H:mm:ss":"-0800" }}
+        </h4>
+      </div>
+    </div>
+    
+    <div class="row">
+      <div
+        *ngIf="openstatus"
+        class="alert alert-success border-0 p-0 d-inline-flex mx-auto"
+        role="alert"
+      >
+        Market is Open
+      </div>
+      <div
+        *ngIf="!openstatus"
+        class="alert alert-danger border-0 p-0 d-inline-flex mx-auto"
+        role="alert"
+      >
+        Market Closed on
+        {{ lasttimestamp | date: "yyyy-MM-dd H:mm:ss":"-0800" }}
+      </div>
+    </div>
+  </div>
+
+  <mat-tab-group *ngIf="tickerExist" mat-stretch-tabs>
+    <!-- summary tab -->
+    <mat-tab label="Summary">
+      <div class="container" id="summary-content">
+        <div class="row flex-row mt-4">
+          <div class="col-sm">
+            <div class="row ml-1">
+              <div class="col p-0">
+                <p class="m-0"><b>High Price:</b>&#160; {{ latestprice.h }}</p>
+                <p class="m-0"><b>Low Price:</b>&#160;&#160; {{ latestprice.l }}</p>
+                <p class="m-0"><b>Open Price:</b> {{ latestprice.o }}</p>
+                <p class="m-0"><b>Prev. Close:</b> {{ latestprice.pc }}</p>
+                <!-- <p class="m-0">
+                  Volume:&#160;&#160;&#160;&#160;&#160;&#160;
+                  {{ latestprice.volume }}
+                </p> -->
+              </div>
+
+            </div>
+
+            <!-- company description row -->
+            <div class="row mt-5">
+              <h2 class="row mt-1 mx-auto"><u>About the company</u></h2>
+            </div>
+            <p class="row"><b>IPO Start Date:</b>&#160; {{ metadata.ipo }}</p>
+            <p class="row"><b>Industry:</b>&#160; {{ metadata.finnhubIndustry }}</p>
+            <p class="row"><b>Webpage:</b>&#160; {{ metadata.weburl }}</p>
+            <div class="row" style="margin: 0px !important;">
+              
+              <p  *ngFor="let peer of peerList"  >
+                <a style="color: blue;" (click)="goToNewTicker(peer)"> {{peer}},&nbsp; </a>
+               
+              </p>
+            </div>
+          </div>
+
+          <!-- daily charts area -->
+          <div class="col-sm">
+            <highcharts-chart
+              *ngIf="isHighcharts"
+              [Highcharts]="Highcharts"
+              [options]="dailyChartOptions"
+              style="width: 100%; height: 400px; display: block"
+            >
+            </highcharts-chart>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- news tab -->
+    <mat-tab label="Top News">
+      <div class="container" id="news-content">
+        <div class="row p-1" *ngIf="allnews">
+          <div
+            class="card col-sm-5 m-2 bg-light mx-auto p-0"
+            style="min-width: 48%; max-height: 280px"
+            *ngFor="let news of allnews"
+          >
+            <div class="card-body row" (click)="openNewsDetail(news)">
+              <div class="col-md-2 m-0 p-0 my-auto">
+                <img
+                
+                  class="card-img m-0 my-auto"
+                  src="{{ news.image }}"
+                  alt="News card image cap"
+                />
+              </div>
+              <div class="col">
+                <h3 class="card-title text-black-50">{{ news.headline }}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- charts tab -->
+    <mat-tab label="Charts">
+      <div class="container" id="charts-content">
+        <highcharts-chart
+          class="col-sm"
+          *ngIf="isHighcharts"
+          [Highcharts]="Highcharts"
+          [constructorType]="'stockChart'"
+          [options]="histChartOptions"
+          style="width: 100%; height: 700px; display: block"
+        >
+        </highcharts-chart>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Insights">
+     <div style="overflow: hidden;">
+      <div  style="display: flex; justify-content: center; margin-top: 10px;">
+        <h1><b>Social Sentiments</b></h1>
+      </div>
+        <div style="display: flex; justify-content: center;">
+          
+          <table class="table" style="width: 50%; text-align: center;">
+            
+            <thead>
+              <tr style="background-color: rgb(221, 221, 221); ">
+                <th scope="col">{{ticker}}</th>
+                <th scope="col">Reddit</th>
+                <th scope="col">Twitter</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th style="background-color: rgb(221, 221, 221)" scope="row">Total Mentions</th>
+                <td>{{rtotal}}</td>
+                <td>{{ttotal}}</td>
+              </tr>
+              <tr>
+                <th style="background-color: rgb(221, 221, 221)" scope="row">Positive Mentions</th>
+                <td>{{rpos}}</td>
+                <td>{{tpos}}</td>
+              </tr>
+              <tr >
+                <th style="background-color: rgb(221, 221, 221)" scope="row">Negative Mentions</th>
+                <td>{{rneg}}</td>
+                <td>{{tneg}}</td>
+              </tr>
+              </tbody>
+              </table>
+        </div>
+          <div class = "row">
+            <div class="col-md-6 col-sm-6">
+              <highcharts-chart
+                *ngIf="isHighcharts"
+                [Highcharts]="Highcharts"
+                [options]="reccharts"
+                class="chartSize"
+              >
+              </highcharts-chart>
+            </div>
+            <div class="col-md-6 col-sm-6">
+              <highcharts-chart
+                *ngIf="isHighcharts"
+                [Highcharts]="Highcharts"
+                [options]="earchart"
+                class="chartSize"
+              >
+              </highcharts-chart>
+            </div>
+           </div>
+     </div>
+
+    </mat-tab>
+
+  </mat-tab-group>
+</div>
+
+<!-- if ticker does not exist, show message -->
+<div *ngIf="metadata && !tickerExist" class="container mt-5">
+  <div class="alert alert-danger text-center text-dark" role="alert">
+    No Data found. Please enter valid Ticker
+  </div>
+</div>

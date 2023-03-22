@@ -1,0 +1,42 @@
+#meta-ticker, .latest-last {
+  font-size: 40px;
+}
+
+#meta-name, .change-latest {
+  font-size: 28px;
+}
+
+#buy-button {
+  outline: none;
+  box-shadow: none;
+}
+
+path.neg {
+  color: red;
+}
+
+path.star-fill-icon {
+  color: rgb(255, 195, 0);
+}
+
+path.pos {
+  color: green;
+}
+
+.card-title {
+  line-height: 20px;
+  font-weight: 400;
+  font-size: 14px;
+}
+
+.chartSize{
+  width: 100%; height: 400px; display: block
+}
+@media only screen and (max-width: 600px) {
+  h1{
+      font-size: 30px !important;
+  }
+  .chartSize{
+    width: 80%; height: 380px; display: block
+  }
+ }

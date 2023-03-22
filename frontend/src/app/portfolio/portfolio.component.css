@@ -1,0 +1,22 @@
+h1.portfolio-header {
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 45px;
+}
+
+path.pos {
+  color: green;
+}
+
+path.neg {
+  color: red;
+}
+
+div.card-footer button {
+  outline: none;
+  box-shadow: none;
+}
+
+.card-text div.col-sm div.row div.col {
+  font-size: 16px;
+}

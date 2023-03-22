@@ -1,0 +1,30 @@
+runtime: python27
+api_version: 1
+threadsafe: true
+handlers:
+  - url: /
+    secure: always
+    static_files: dist/frontend/index.html
+    upload: dist/frontend/index.html
+
+
+  - url: /(.*\.(.+))$
+    secure: always
+    static_files: dist/frontend/\1
+    upload: dist/frontend/(.*\.(.+))$
+
+  #  Routing rule for Angular Routing
+  - url: /(.*)
+    secure: always
+    static_files: dist/frontend/index.html
+    upload: dist/frontend/index.html
+skip_files:
+  - e2e/
+  - node_modules/
+  - src/
+  - coverage
+  - ^(./)?\..$
+  - ^(./)?.\.json$
+  - ^(./)?.\.md$
+  - ^(./)?.\.yaml$
+  - ^LICENSE
